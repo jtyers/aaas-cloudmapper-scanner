@@ -1,0 +1,7 @@
+public
+
+.terraform
+terraform.tfstate*
+
+*.zip
+*.tar.gz
