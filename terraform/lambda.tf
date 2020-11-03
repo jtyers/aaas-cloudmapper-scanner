@@ -29,26 +29,26 @@ resource aws_cloudwatch_log_group scanner-invoker {
   retention_in_days = 7
 }
 
-resource aws_lambda_function scanner {
-  function_name = "cloudmapper-scanner"
-  role          = aws_iam_role.scanner.arn
-
-  handler = "handler.handler"
-  runtime = "python3.7"
-  timeout = local.lambda_timeout
-
-  environment {
-    variables = {
-      "BUCKET_NAME" = aws_s3_bucket.result.bucket
-      "RANDOM_WAIT" = "5000"
-    }
-  }
-
-  filename         = var.scanner_function_zip
-  source_code_hash = filebase64sha256(var.scanner_function_zip)
-}
-
-resource aws_cloudwatch_log_group scanner {
-  name              = "/aws/lambda/${aws_lambda_function.scanner.function_name}"
-  retention_in_days = 7
-}
+#resource aws_lambda_function scanner {
+#  function_name = "cloudmapper-scanner"
+#  role          = aws_iam_role.scanner.arn
+#
+#  handler = "handler.handler"
+#  runtime = "python3.7"
+#  timeout = local.lambda_timeout
+#
+#  environment {
+#    variables = {
+#      "BUCKET_NAME" = aws_s3_bucket.result.bucket
+#      "RANDOM_WAIT" = "5000"
+#    }
+#  }
+#
+#  filename         = var.scanner_function_zip
+#  source_code_hash = filebase64sha256(var.scanner_function_zip)
+#}
+#
+#resource aws_cloudwatch_log_group scanner {
+#  name              = "/aws/lambda/${aws_lambda_function.scanner.function_name}"
+#  retention_in_days = 7
+#}

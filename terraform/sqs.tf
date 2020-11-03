@@ -14,8 +14,3 @@ resource aws_sqs_queue queue {
 resource aws_sqs_queue dlq {
   name = "cloudmapper-scanner-dlq"
 }
-
-resource aws_lambda_event_source_mapping queue {
-  event_source_arn = aws_sqs_queue.queue.arn
-  function_name    = aws_lambda_function.scanner.arn
-}
