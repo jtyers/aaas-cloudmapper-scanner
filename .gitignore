@@ -1,8 +1,11 @@
 public
+account-data
+web
 
 .terraform
 terraform.tfstate*
 
+*.git
 *.zip
 *.tar.gz
 *.tgz
