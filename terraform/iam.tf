@@ -76,7 +76,7 @@ resource aws_iam_role scanner {
         {
           "Action": "sts:AssumeRole",
           "Principal": {
-            "Service": "lambda.amazonaws.com"
+            "Service": "ec2.amazonaws.com"
           },
           "Effect": "Allow",
           "Sid": ""

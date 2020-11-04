@@ -2,19 +2,12 @@ FROM ubuntu AS function-builder
   ENV PROWLER_VERSION=2.2.0
 
   RUN apt update \
-    && apt install -y zip curl
-
-	# install prowler
-  RUN mkdir /function \
-    && curl -OfSL https://github.com/toniblyx/prowler/archive/$PROWLER_VERSION.tar.gz \
-    && tar zxf $PROWLER_VERSION.tar.gz -C /function \
-    && mv /function/prowler-$PROWLER_VERSION /function/prowler
+    && apt install -y git curl
 
   # add our scripts
   COPY ./function /function
 
-  RUN cd /function \
-    && zip -qr /function.zip .
+  RUN tar czf /function.tgz -C /function .
 
 FROM ubuntu AS layer-builder
   RUN apt update \
@@ -28,5 +21,5 @@ FROM ubuntu AS layer-builder
     && zip -qr /layer.zip .
 
 FROM ubuntu
-  COPY --from=function-builder /function.zip .
+  COPY --from=function-builder /function.tgz .
   COPY --from=layer-builder /layer.zip .

@@ -46,18 +46,25 @@ data aws_ami ubuntu {
 #}
 
 resource aws_launch_configuration scanner {
-  name          = "cloudmapper-scanner"
+  name_prefix   = "cloudmapper-scanner-"
   key_name      = "jonnytyers"
   image_id      = data.aws_ami.ubuntu.id
   instance_type = "t3a.micro"
 
   user_data = templatefile("cloudmapper-scanner.sh", {
-    scanner_public_key = file(var.ssh_public_key_file),
-    var_queue_url      = aws_sqs_queue.queue.id,
+    queue_url                = aws_sqs_queue.queue.id,
+    region                   = data.aws_region.current.name,
+    bucket_name              = aws_s3_bucket.result.bucket,
+    random_wait              = "",
+    cloudmapper_scanner_code = filebase64(var.scanner_function_tgz),
   })
 
   iam_instance_profile        = aws_iam_instance_profile.scanner.name
   associate_public_ip_address = true
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource aws_autoscaling_group scanner {

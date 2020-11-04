@@ -35,26 +35,31 @@ done
 [ -n "$region" ] || die "must speciy --region"
 
 reportDir="/tmp/scan-report"
-
-export PATH=$PATH:/opt/bin:/opt/prowler:/opt/python/bin:$(dirname $0)/prowler
-
 mkdir -p $reportDir
+	
+# install cloudmapper
+cloudmapperDir="/opt/cloudmapper"
+[ -d "$cloudmapperDir" ] || \
+  git clone --depth=1 https://github.com/duo-labs/cloudmapper.git "$cloudmapperDir"
 
-#cd /opt/cloudmapper  # hardcoded cloudmapper install location
-cd ~/github/cloudmapper  # hardcoded cloudmapper install location
+
+cd "$cloudmapperDir"  # hardcoded cloudmapper install location
+#cd ~/github/cloudmapper  # hardcoded cloudmapper install location
 
 # ensure we start with no config
 configFile="config.json"
 rm -f $configFile
 
-python cloudmapper.py configure \
+python3 cloudmapper.py configure \
   add-account \
   --config-file $configFile \
   --name $account \
   --id $account
 
-python cloudmapper.py collect \
+python3 cloudmapper.py collect \
   --regions $region \
-  --account $account
+  --account $account \
+  || true
+  # allow failures so errors are picked up
 
 tar czf $reportDir/scan-report.tgz -C account-data .

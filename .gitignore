@@ -5,3 +5,4 @@ terraform.tfstate*
 
 *.zip
 *.tar.gz
+*.tgz

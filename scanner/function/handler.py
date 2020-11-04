@@ -10,7 +10,11 @@ import time
 
 report_dir = "/tmp/scan-report"
 
-queue_url = "https://sqs.eu-west-1.amazonaws.com/150445549066/cloudmapper-scanner"
+# these vars are templated in by Terraform
+queue_url = os.environ["QUEUE_URL"]
+bucket_name = os.environ["BUCKET_NAME"]
+random_wait = os.environ["RANDOM_WAIT"]
+
 max_messages = 3
 max_wait_time = 20
 dirname = os.path.dirname(os.path.abspath(__file__))
@@ -23,7 +27,7 @@ Script for individual `cloudmapper collect` jobs.
 
 # RANDOM_WAIT can be used to specify a random wait (in ms) up to a configured amount
 wait = os.environ.get('RANDOM_WAIT', None)
-if wait is not None:
+if wait is not None and wait != "":
     random.seed()
     wait_ms = random.randint(500, int(wait))
 
@@ -58,7 +62,6 @@ for message in response.get('Messages', []):
     print('message', message['Body'])
     body = json.loads(message['Body'])
 
-    bucket_name = os.environ["BUCKET_NAME"]
     created = datetime.datetime.fromisoformat(body['created'])
 
     credentials_secret_id = body.get("credentials_secret_id", None)
@@ -140,8 +143,8 @@ for message in response.get('Messages', []):
 #        stderr=subprocess.PIPE,
     )
 
-    # scan.sh should save account data to /tmp/scan-report/scan_report.tgz
-    report_archive_path = '/tmp/scan-report/scan_report.tgz'
+    # scan.sh should save account data to /tmp/scan-report/scan-report.tgz
+    report_archive_path = '/tmp/scan-report/scan-report.tgz'
 
     key = "results/{account_id}/{year}/{month}/{day}/{hour}/{scan_id}.tgz".format(
         account_id=body['account_id'],
@@ -160,4 +163,7 @@ for message in response.get('Messages', []):
         )
 
     os.unlink(report_archive_path)  # delete so next loop run cannot pick it up mistakenly
-    message.delete()
+    sqs.delete_message(
+        QueueUrl=queue_url,
+        ReceiptHandle=message['ReceiptHandle'],
+    )
