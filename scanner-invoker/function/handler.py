@@ -39,7 +39,7 @@ def handler(event, context):
         if event.get('credentials_secret_id'):
             raise ValueError('cannot specify credentials and credentials_secret_id')
 
-        credentials_parameter_name = '/cloudmapper/{}'.format(scan_id)
+        credentials_parameter_name = '/cloudmapper-scanner/{}'.format(scan_id)
         ssm.put_parameter(
             Name=credentials_parameter_name,
             Value=json.dumps(event.get('credentials')),
