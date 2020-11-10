@@ -64,32 +64,24 @@ $c collect \
   --account $account \
   || true  # allow failures so errors are picked up
 
-# run various reporting tools here too
-# FIXME: sg_ips currently isn't here as we need to sort out missing deps, MaxMind GeoLite data etc
-
-mkdir -p data/aws \
-  && cd data/aws \
-  && aws ec2 describe-regions \
-    | jq -r '.Regions[].RegionName' \
-    | xargs -I{} mkdir {} \
-  && aws ec2 describe-regions \
-    | jq -r '.Regions[].RegionName' \
-    | xargs -I{} sh -c 'aws --region {} ec2 describe-images --executable-users all > {}/ec2-describe-images.json' \
-  && cd - \
-  && $c amis --accounts $account
-
-$c audit        --accounts $account --json > $reportDir/web/account-data/audit.json || true
-$c find_admins  --accounts $account --json > $reportDir/web/account-data/find_admins.json || true
-$c find_unused  --accounts $account --json > $reportDir/web/account-data/find_unused.json || true
-$c public       --accounts $account --json > $reportDir/web/account-data/public.json || true
-
-# report: saves to web/account-data/report.html
-$c report \
-  --accounts $account \
-  || true  # allow failures so errors are picked up
-
-# iam_report: saves to web/account-data/iam_report.html
-$c iam_report   --accounts $account || true  # allow failures so errors are picked up
+# # run various reporting tools here too
+# # FIXME: sg_ips currently isn't here as we need to sort out missing deps, MaxMind GeoLite data etc
+# 
+# # this requires GBs-worth of data on public AMIs, so don't bother
+# #$c amis         --accounts $account
+# 
+# $c audit        --accounts $account --json > web/account-data/audit.json || true
+# $c find_admins  --accounts $account --json > web/account-data/find_admins.json || true
+# $c find_unused  --accounts $account --json > web/account-data/find_unused.json || true
+# $c public       --accounts $account --json > web/account-data/public.json || true
+# 
+# # report: saves to web/account-data/report.html
+# $c report \
+#   --accounts $account \
+#   || true  # allow failures so errors are picked up
+# 
+# # iam_report: saves to web/account-data/iam_report.html
+# $c iam_report   --accounts $account || true  # allow failures so errors are picked up
 
 # tar up both account-data and web folders (web can be served from S3)
 tar czf $reportDir/scan-report.tgz account-data web

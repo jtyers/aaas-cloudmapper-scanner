@@ -42,3 +42,9 @@ resource aws_s3_bucket_public_access_block result {
 
   depends_on = [aws_s3_bucket.result]
 }
+
+resource aws_s3_bucket public-images {
+  bucket = "aaas-ec2-public-images"
+  acl    = "private"
+}
+

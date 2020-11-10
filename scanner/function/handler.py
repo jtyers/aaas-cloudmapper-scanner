@@ -27,7 +27,7 @@ Script for individual `cloudmapper collect` jobs.
 
 # RANDOM_WAIT can be used to specify a random wait (in ms) up to a configured amount
 wait = os.environ.get('RANDOM_WAIT', None)
-if wait is not None and wait != "":
+if wait is not None and wait != "" and wait != "0":
     random.seed()
     wait_ms = random.randint(500, int(wait))
 
