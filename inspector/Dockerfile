@@ -57,5 +57,6 @@ FROM python:3.7-slim
 
   COPY . /usr/local/
 
-  ENTRYPOINT ["bash"]
-  CMD [ "-c", "/usr/local/bin/inspect.sh" ]
+  #ENTRYPOINT ["bash"]
+  #CMD [ "-c", "/usr/local/bin/inspect.sh" ]
+  ENTRYPOINT [ "/usr/local/bin/inspect.sh" ]

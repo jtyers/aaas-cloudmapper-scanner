@@ -19,6 +19,13 @@ $c find_unused  --accounts $account > web/account-data/find_unused.json || true
 $c public       --accounts $account > web/account-data/public.json || true
 
 python3 cloudmapper.py webserver --public >/dev/null &
+pid=$!
 
-echo "dropping into shell"
-bash -il
+if [ $# -gt 0 ]; then
+  "$@"
+else
+  echo "dropping into shell"
+  bash -il
+fi
+
+kill $pid
