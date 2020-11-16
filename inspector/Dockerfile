@@ -9,7 +9,7 @@ FROM python:3.7-slim
 
   RUN git config --global user.email "foo@bar.com" \
     && git config --global user.name "foo"
-  RUN git clone https://github.com/duo-labs/cloudmapper.git /opt/cloudmapper
+  RUN git clone --branch 2.9.1 https://github.com/duo-labs/cloudmapper.git /opt/cloudmapper
   
   WORKDIR /opt/cloudmapper
   RUN pip install -r requirements.txt
