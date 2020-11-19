@@ -50,19 +50,20 @@ scanFileUpdated="scan-updated.tgz"
 
 # saveDataTo: printf fmt string, called with <account id> <scamn id>; only used for
 #  non-interactive mode
-saveDataTo="$HOME/GoogleDrive-encrypted/BristolCyberSecurity/Projects/NBS AWS Audit 2020/scan-results/%s/%s"
 
+saveDataTo="" #$HOME/GoogleDrive-encrypted/BristolCyberSecurity/Projects/NBS AWS Audit 2020/scan-results/%s/%s
 interactive=0
 chosenAccount=""
 chosenScan=""
 
-O=`getopt -n scan.sh -l interactive,account:,scan: -- ia:s: "$@"` || die "$usage"
+O=`getopt -n scan.sh -l interactive,account:,scan:,save-to: -- ia:s:S: "$@"` || die "$usage"
 eval set -- "$O"
 while true; do
     case "$1" in
     -i|--interactive)	  interactive=1; shift;;
     -a|--account)	  chosenAccount=$2; shift; shift;;
     -s|--scan)	    chosenScan=$2; shift; shift;;
+    -S|--save-to)	    saveDataTo="$2"; shift; shift;;
     --)			        shift; break;;
     *)			        die "$usage";;
     esac
@@ -71,8 +72,8 @@ done
 [ $# -eq 0 ] || die "$USAGE"
 
 if [ $interactive -eq 0 ]; then
-  [ -n "$chosenAccount" ] || die "must speciy --account"
-  [ -n "$chosenScan" ] || die "must speciy --scan"
+  [ -n "$chosenAccount" ] || die "must specify --account"
+  [ -n "$chosenScan" ] || die "must specify --scan"
 
   echo "inspect-wrapper: $chosenAccount $chosenScan" >&2
  
@@ -85,9 +86,13 @@ if [ $interactive -eq 0 ]; then
   extractScan
   runContainer true  # run 'true' just to cause it to exit
 
-  saveDataToDir=$(printf "$saveDataTo" "$chosenAccount" "$scanId")
-  mkdir -p "$saveDataToDir"
-  cp -r $extractDir/web/account-data "$saveDataToDir"
+  if [ -n "$saveDataTo" ]; then
+    saveDataToDir="$saveDataTo/$chosenAccount/$scanId"
+    echo "inspect-wrapper: saving data to $saveDataToDir" >&2
+
+    mkdir -p "$saveDataToDir"
+    cp -r $extractDir/web/account-data "$saveDataToDir"
+  fi
 
   # we only save web/account-data (account-data is just json blobs)
 
